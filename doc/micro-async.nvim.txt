@@ -1,335 +1,86 @@
-==============================================================================
-                                                                   *micro-async*
-
-M.callback({co})                                          *micro-async.callback*
-    Create a callback function that resumes the current or specified coroutine when called.
-
-
-    Parameters: ~
-        {co}  (thread|nil)  The thread to resume, defaults to the running one.
-
-    Returns: ~
-        (fun(args:...))
-
-
-M.void({fn})                                                  *micro-async.void*
-    Create an async function that can be called from a synchronous context.
-    Cannot return values as it is non-blocking.
-
-
-    Parameters: ~
-        {fn}  (fun(args:...))
-
-    Returns: ~
-        (fun(args:...))
-
-
-M.run({fn}, {cb}, {...})                                       *micro-async.run*
-    Run a function asynchronously and call the callback with the result.
-
-
-    Parameters: ~
-        {fn}   (fun(args:...):...)
-        {cb}   (fun(args:...))
-        {...}  (any)
-
-
-M.wrap({fn}, {argc})                                          *micro-async.wrap*
-    Wrap a callback-style function to be async.
-
-
-    Parameters: ~
-        {fn}    (fun(args:...):...any)
-        {argc}  (integer)
-
-    Returns: ~
-        (fun(args:...):...)
-
-
-M.schedule()                                              *micro-async.schedule*
-    Yields to the Neovim scheduler
-
-    @async
-
-
-M.defer({timeout})                                           *micro-async.defer*
-    Yields the current task, resuming when the specified timeout has elapsed.
-
-    @async
-
-    Parameters: ~
-        {timeout}  (integer)
-
-
-M.work({fn}, {...})                                           *micro-async.work*
-    Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
-
-    @async
-
-    Parameters: ~
-        {fn}   (fun(args:...):...)
-        {...}  (...uv.aliases.threadargs)
-
-    Returns: ~
-        (...uv.aliases.threadargs)
-
-
-M.system({cmd}, {opts})                                     *micro-async.system*
-    Async vim.system
-
-    @async
-
-    Parameters: ~
-        {cmd}   (string[])  Command to run
-        {opts}  (table)     Options to pass to `vim.system`
-
+*micro-async.nvim.txt*           For            Last change: 2023 September 27
 
 ==============================================================================
-                                                               *micro-async.lsp*
+Table of Contents                         *micro-async.nvim-table-of-contents*
 
-lsp.buf_request                                    *micro-async.lsp.buf_request*
-    Async wrapper around `vim.lsp.buf_request`.
-
-    Type: ~
-        (async)  fun(bufnr: integer, method: string, params: table?): error: lsp.ResponseError?, result: any, context: lsp.HandlerContext, config: table?
-
-
-lsp.buf_request_all                            *micro-async.lsp.buf_request_all*
-    Async wrapper around `vim.lsp.buf_request_all`.
-
-    Type: ~
-        (async)  fun(bufnr: integer, method: string, params: table?): table<integer, { error: lsp.ResponseError, result: any }>
-
-
-lsp.request.references()                    *micro-async.lsp.request.references*
-
-
-lsp.request.definition()                    *micro-async.lsp.request.definition*
-
-
-lsp.request.type_definition()          *micro-async.lsp.request.type_definition*
-
-
-lsp.request.implementation()            *micro-async.lsp.request.implementation*
-
-
-lsp.request.rename()                            *micro-async.lsp.request.rename*
-
-
-lsp.request.signature_help()            *micro-async.lsp.request.signature_help*
-
-
-lsp.request.document_symbols()        *micro-async.lsp.request.document_symbols*
-
-
-lsp.request.hover()                              *micro-async.lsp.request.hover*
-
-
-lsp.request.inlay_hint()                    *micro-async.lsp.request.inlay_hint*
-
+1. micro-async.nvim                        |micro-async.nvim-micro-async.nvim|
+  - Installation              |micro-async.nvim-micro-async.nvim-installation|
+  - Usage                            |micro-async.nvim-micro-async.nvim-usage|
 
 ==============================================================================
-                                                                *micro-async.uv*
+1. micro-async.nvim                        *micro-async.nvim-micro-async.nvim*
+
+Extremely simple async library for Neovim.
+
+
+INSTALLATION                  *micro-async.nvim-micro-async.nvim-installation*
+
+>lua
+    require("lazy").setup({
+      --- ...
+      { "willothy/micro-async.nvim" } -- no need to call setup()
+    })
+<
+
+
+USAGE                                *micro-async.nvim-micro-async.nvim-usage*
+
+>lua
+    
+    local a = require("micro-async")
+    
+    -- Run a function asynchronously and call the callback with the result.
+    a.run(
+      function()
+        -- run a system command
+        local res = a.system({ "ls" }, {})
+    
+        -- wait 2 seconds
+        a.defer(2000)
+    
+        -- return the result, calling the callback
+        return res.stdout
+      end,
+      vim.print -- print the result
+    )
+    
+    -- Yield to the scheduler to call the nvim API safely from luv callbacks
+    a.run(
+      function()
+        --- Use a timer to simulate resuming from a luv callback
+        local t = vim.uv.new_timer()
+        coroutine.yield(t:start(1000, 0, a.callback()))
+        t:close()
+        a.schedule() -- yield to `vim.schedule()` to ensure the nvim API is safe to call
+    
+        return vim.api.nvim_exec2("echo 'hello world'", { output = true }).output
+      end,
+      vim.print
+    )
+    
+    -- Count lines of code using `tokei`, and format the output with `jq`
+    a.run(
+      function()
+        local tokei = a.system({ "tokei", "--output", "json" }, { text = true })
+    
+        if tokei.code ~= 0 then
+          return tokei.stderr
+        end
+    
+        local jq = a.system({ "jq" }, {
+          text = true,
+          stdin = tokei.stdout,
+        })
+    
+        if jq.code ~= 0 then
+          return jq.stderr
+        end
+    
+        return jq.stdout
+      end, 
+      vim.print
+    )
+<
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
-uv.fs_opendir()                                      *micro-async.uv.fs_opendir*
-
-
-uv.fs_readdir                                        *micro-async.uv.fs_readdir*
-
-    Type: ~
-        (async)  fun(dir: luv_dir_t): err: string?, entries: uv.aliases.fs_readdir_entries[]
-
-
-uv.fs_realpath                                      *micro-async.uv.fs_realpath*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, path: string?
-
-
-uv.fs_readlink                                      *micro-async.uv.fs_readlink*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, path: string?
-
-
-uv.fs_access                                          *micro-async.uv.fs_access*
-
-    Type: ~
-        (async)  fun(path: string, mode: integer): err: string?, permissions: boolean?
-
-
-uv.fs_read                                              *micro-async.uv.fs_read*
-
-    Type: ~
-        (async)  fun(fd: integer, size: integer, offset: integer?): err: string?, data: string?
-
-
-uv.fs_rename                                          *micro-async.uv.fs_rename*
-
-    Type: ~
-        (async)  fun(path: string, new_path: string): err: string?, success: boolean?
-
-
-uv.fs_open                                              *micro-async.uv.fs_open*
-
-    Type: ~
-        (async)  fun(path: string, flags: integer | uv.aliases.fs_access_flags, mode: integer): err: string?, fs: integer?
-
-
-uv.fs_mkstemp                                        *micro-async.uv.fs_mkstemp*
-
-    Type: ~
-        (async)  fun(template: string): err: string?, fd: integer?, path: string?
-
-
-uv.fs_mkdtemp                                        *micro-async.uv.fs_mkdtemp*
-
-    Type: ~
-        (async)  fun(template: string): err: string?, path: string?
-
-
-uv.fs_rmdir                                            *micro-async.uv.fs_rmdir*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, success: boolean?
-
-
-uv.fs_mkdir                                            *micro-async.uv.fs_mkdir*
-
-    Type: ~
-        (async)  fun(path: string, mode: integer): err: string?, success: boolean?
-
-
-uv.fs_chmod                                            *micro-async.uv.fs_chmod*
-
-    Type: ~
-        (async)  fun(path: string, mode: integer): err: string?, success: boolean?
-
-
-uv.fs_chown                                            *micro-async.uv.fs_chown*
-
-    Type: ~
-        (async)  fun(path: string, uid: integer, gid: integer): err: string?, success: boolean?
-
-
-uv.fs_fchmod                                          *micro-async.uv.fs_fchmod*
-
-    Type: ~
-        (async)  fun(fd: integer, mode: integer): err: string?, success: boolean?
-
-
-uv.fs_fchown                                          *micro-async.uv.fs_fchown*
-
-    Type: ~
-        (async)  fun(fd: integer, uid: integer, gid: integer): err: string?, success: boolean?
-
-
-uv.getnameinfo                                      *micro-async.uv.getnameinfo*
-
-    Type: ~
-        (async)  fun(address: uv.aliases.getsockname_rtn)
-
-
-uv.fs_copyfile                                      *micro-async.uv.fs_copyfile*
-
-    Type: ~
-        (async)  fun(path: string, new_path: string, flags: uv.aliases.fs_copyfile_flags): err: string?, success: boolean?
-
-
-uv.fs_futime                                          *micro-async.uv.fs_futime*
-
-    Type: ~
-        (async)  fun(fd: integer, atime: integer, mtime: integer): err: string?, success: boolean?
-
-
-uv.fs_ftruncate                                    *micro-async.uv.fs_ftruncate*
-
-    Type: ~
-        (async)  fun(fd: integer, offset: integer): err: string?, success: boolean?
-
-
-uv.fs_link                                              *micro-async.uv.fs_link*
-
-    Type: ~
-        (async)  fun(path: string, new_path: string): err: string?, success: boolean?
-
-
-uv.fs_unlink                                          *micro-async.uv.fs_unlink*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, success: boolean?
-
-
-uv.fs_write                                            *micro-async.uv.fs_write*
-
-    Type: ~
-        (async)  fun(fd: integer, data: string | string[], offset: integer?): err: string?, success: boolean?
-
-
-uv.fs_symlink                                        *micro-async.uv.fs_symlink*
-
-    Type: ~
-        (async)  fun(path: string, newpath: string, flags: integer | uv.aliases.fs_symlink_flags): err: string?, success: boolean?
-
-
-uv.fs_lutime                                          *micro-async.uv.fs_lutime*
-
-    Type: ~
-        (async)  fun(path: string, atime: integer, mtime: integer): err: string?, success: boolean?
-
-
-uv.fs_stat                                              *micro-async.uv.fs_stat*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, stat: uv.aliases.fs_stat_table
-
-
-uv.fs_scandir                                        *micro-async.uv.fs_scandir*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, stat: uv_fs_t?
-
-
-uv.fs_statfs                                          *micro-async.uv.fs_statfs*
-
-    Type: ~
-        (async)  fun(path: string): err: string?, stat: uv.aliases.fs_statfs_stats
-
-
-uv.fs_fsync                                            *micro-async.uv.fs_fsync*
-
-    Type: ~
-        (async)  fun(fd: integer): err: string?, success: boolean?
-
-
-uv.fs_sendfile                                      *micro-async.uv.fs_sendfile*
-
-    Type: ~
-        (async)  fun(out_fd: integer, in_fd: integer, in_offset: integer, size: integer): err: string?, bytes: integer?
-
-
-uv.fs_fdatasync                                    *micro-async.uv.fs_fdatasync*
-
-    Type: ~
-        (async)  fun(fd: integer): err: string?, success: boolean?
-
-
-uv.fs_close                                            *micro-async.uv.fs_close*
-
-    Type: ~
-        (async)  fun(fd: integer): err: string?, success: boolean?
-
-
-uv.fs_utime                                            *micro-async.uv.fs_utime*
-
-    Type: ~
-        (async)  fun(path: string, atime: integer, mtime: integer): err: string?, success: boolean?
-
-
-uv.new_work()                                          *micro-async.uv.new_work*
-
-
-uv.queue_work()                                      *micro-async.uv.queue_work*
-
-
-vim:tw=78:ts=8:noet:ft=help:norl:

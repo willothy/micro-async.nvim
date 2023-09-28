@@ -15,10 +15,21 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Generating help
+      - name: panvimdoc
+        uses: kdheepak/panvimdoc@main
+        with:
+          vimdoc: micro-async.nvim
+          version: "Neovim >= 0.7.0"
+          demojify: true
+          treesitter: true
+          ignorerawblocks: true
+          toc: false
+
+      - name: lemmy-help
         run: |
           curl -Lq https://github.com/numToStr/lemmy-help/releases/latest/download/lemmy-help-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          ./lemmy-help -f -t -a -c lua/micro-async/init.lua lua/micro-async/lsp.lua lua/micro-async/uv.lua > doc/${{env.PLUGIN_NAME}}.txt
+          cat doc/micro-async.nvim.txt | sed '$d' > /tmp/micro-async.nvim.txt && cat /tmp/micro-async.nvim.txt > doc/micro-async.nvim.txt
+          ./lemmy-help -f -t -a -c lua/micro-async/init.lua lua/micro-async/lsp.lua lua/micro-async/uv.lua >> doc/micro-async.nvim.txt
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
