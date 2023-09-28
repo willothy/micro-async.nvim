@@ -1,4 +1,6 @@
-# micro-async.nvim
+<div align="center">
+  <h1>micro-async.nvim</h1>
+</div>
 
 Extremely simple async library for Neovim.
 
@@ -65,7 +67,7 @@ a.run(
     end
 
     return jq.stdout
-  end, 
+  end,
   vim.print
 )
 ```

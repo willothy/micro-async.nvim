@@ -6,7 +6,7 @@ permissions:
   contents: write
 
 env:
-  PLUGIN_NAME: micro-async.nvim
+  PLUGIN_NAME: micro-async
 
 jobs:
   docs:
@@ -18,7 +18,7 @@ jobs:
       - name: panvimdoc
         uses: kdheepak/panvimdoc@main
         with:
-          vimdoc: micro-async.nvim
+          vimdoc: micro-async
           version: "Neovim >= 0.7.0"
           demojify: true
           treesitter: true
@@ -28,8 +28,8 @@ jobs:
       - name: lemmy-help
         run: |
           curl -Lq https://github.com/numToStr/lemmy-help/releases/latest/download/lemmy-help-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          cat doc/micro-async.nvim.txt | sed '$d' > /tmp/micro-async.nvim.txt && cat /tmp/micro-async.nvim.txt > doc/micro-async.nvim.txt
-          ./lemmy-help -f -t -a -c lua/micro-async/init.lua lua/micro-async/lsp.lua lua/micro-async/uv.lua >> doc/micro-async.nvim.txt
+          cat doc/${{ env.PLUGIN_NAME }}.txt | sed '$d' > /tmp/${{ env.PLUGIN_NAME }}.txt && cat /tmp/${{ env.PLUGIN_NAME }}.txt > doc/${{ env.PLUGIN_NAME }}.txt
+          ./lemmy-help -f -t -a -c lua/micro-async/init.lua lua/micro-async/lsp.lua lua/micro-async/uv.lua >> doc/${{ env.PLUGIN_NAME }}.txt
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
