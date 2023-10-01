@@ -21,8 +21,8 @@ end
 ---Create an async function that can be called from a synchronous context.
 ---Cannot return values as it is non-blocking.
 ---
----@param fn fun(args: ...)
----@return fun(args: ...)
+---@param fn fun(...)
+---@return fun(...)
 function M.void(fn)
 	return function(...)
 		resume(create(fn), ...)
@@ -31,8 +31,8 @@ end
 
 ---Run a function asynchronously and call the callback with the result.
 ---
----@param fn fun(args: ...):...
----@param cb fun(args: ...)
+---@param fn fun(...):...
+---@param cb fun(...)
 ---@param ... any
 function M.run(fn, cb, ...)
 	resume(
@@ -45,9 +45,9 @@ end
 
 ---Wrap a callback-style function to be async.
 ---
----@param fn fun(args: ...): ...any
+---@param fn fun(...): ...any
 ---@param argc integer
----@return fun(args: ...): ...
+---@return fun(...): ...
 function M.wrap(fn, argc)
 	return function(...)
 		local args = { ... }
@@ -74,7 +74,7 @@ end
 ---Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
 ---
 ---@async
----@param fn fun(args: ...):...
+---@param fn fun(...):...
 ---@param ... ...uv.aliases.threadargs
 ---@return ...uv.aliases.threadargs
 function M.work(fn, ...)
