@@ -6,11 +6,11 @@ local wrap = require("micro-async").wrap
 local lsp = {}
 
 ---Async wrapper around `vim.lsp.buf_request`.
----@type async fun(bufnr: integer, method: string, params: table?): error: lsp.ResponseError?, result: any, context: lsp.HandlerContext, config: table?
+---@type async fun(bufnr: integer, method: string, params: table?): error: lsp.ResponseError?, result: table, context: lsp.HandlerContext, config: table?
 lsp.buf_request = wrap(vim.lsp.buf_request, 4)
 
 ---Async wrapper around `vim.lsp.buf_request_all`.
----@type async fun(bufnr: integer, method: string, params: table?): table<integer, { error: lsp.ResponseError, result: any }>
+---@type async fun(bufnr: integer, method: string, params: table?): table<integer, { error: lsp.ResponseError, result: table }>
 lsp.buf_request_all = wrap(vim.lsp.buf_request_all, 4)
 
 lsp.request = {}
@@ -49,6 +49,10 @@ end
 
 lsp.request.inlay_hint = function(buf, params)
 	return lsp.buf_request(buf, "textDocument/inlayHint", params)
+end
+
+lsp.request.code_actions = function(buf, params)
+	return lsp.buf_request(buf, "textDocument/codeAction", params)
 end
 
 return lsp
