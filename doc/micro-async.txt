@@ -145,14 +145,14 @@ lsp.buf_request                                    *micro-async.lsp.buf_request*
     Async wrapper around `vim.lsp.buf_request`.
 
     Type: ~
-        (async)  fun(bufnr: integer, method: string, params: table?): error: lsp.ResponseError?, result: any, context: lsp.HandlerContext, config: table?
+        (async)  fun(bufnr: integer, method: string, params: table?): error: lsp.ResponseError?, result: table, context: lsp.HandlerContext, config: table?
 
 
 lsp.buf_request_all                            *micro-async.lsp.buf_request_all*
     Async wrapper around `vim.lsp.buf_request_all`.
 
     Type: ~
-        (async)  fun(bufnr: integer, method: string, params: table?): table<integer, { error: lsp.ResponseError, result: any }>
+        (async)  fun(bufnr: integer, method: string, params: table?): table<integer, { error: lsp.ResponseError, result: table }>
 
 
 lsp.request.references()                    *micro-async.lsp.request.references*
@@ -180,6 +180,9 @@ lsp.request.hover()                              *micro-async.lsp.request.hover*
 
 
 lsp.request.inlay_hint()                    *micro-async.lsp.request.inlay_hint*
+
+
+lsp.request.code_actions()                *micro-async.lsp.request.code_actions*
 
 
 ==============================================================================
