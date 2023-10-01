@@ -138,6 +138,33 @@ M.system({cmd}, {opts})                                     *micro-async.system*
         {opts}  (table)     Options to pass to `vim.system`
 
 
+micro-async.SelectOpts                      *micro-async.micro-async.SelectOpts*
+
+    Type: ~
+        
+
+
+micro-async.InputOpts                        *micro-async.micro-async.InputOpts*
+
+    Type: ~
+        
+
+
+M.ui.select({items}, {opts})                             *micro-async.ui.select*
+    @async
+
+    Parameters: ~
+        {items}  (any[])
+        {opts}   (micro-async.SelectOpts)  @return any?, integer?
+
+
+M.ui.input({opts})                                        *micro-async.ui.input*
+    @async
+
+    Parameters: ~
+        {opts}  (micro-async.InputOpts)  @return string?
+
+
 ==============================================================================
                                                                *micro-async.lsp*
 
