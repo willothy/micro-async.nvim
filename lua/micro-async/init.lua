@@ -91,6 +91,32 @@ M.system = function(cmd, opts)
 	return yield(vim.system(cmd, opts, M.callback()))
 end
 
+---@module "micro-async.lsp"
+M.lsp = nil
+
+---@module "micro-async.uv"
+M.uv = nil
+
+M.ui = {}
+
+---@alias micro-async.SelectOpts { prompt: string?, format_item: nil|fun(item: any): string, kind: string? }
+---@alias micro-async.InputOpts { prompt: string?, default: string?, completion: string?, highlight: fun(text: string) }
+
+---@async
+---@param items any[]
+---@param opts micro-async.SelectOpts
+---@return any?, integer?
+M.ui.select = function(items, opts)
+	return yield(vim.ui.select(items, opts, M.callback()))
+end
+
+---@async
+---@param opts micro-async.InputOpts
+---@return string?
+M.ui.input = function(opts)
+	return yield(vim.ui.input(opts, M.callback()))
+end
+
 setmetatable(M, {
 	__index = function(_, k)
 		local ok, mod = pcall(require, "micro-async." .. k)
