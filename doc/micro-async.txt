@@ -1,4 +1,4 @@
-*micro-async.txt*      For Neovim >= 0.7.0      Last change: 2023 September 28
+*micro-async.txt*       For Neovim >= 0.7.0       Last change: 2023 October 01
 
 Extremely simple async library for Neovim.
 
@@ -88,38 +88,20 @@ M.callback({co})                                          *micro-async.callback*
         (fun(args:...))
 
 
-M.void({fn})                                                  *micro-async.void*
-    Create an async function that can be called from a synchronous context.
-    Cannot return values as it is non-blocking.
+M.void()                                                      *micro-async.void*
+    @return fun(...)
 
 
-    Parameters: ~
-        {fn}  (fun(args:...))
-
-    Returns: ~
-        (fun(args:...))
-
-
-M.run({fn}, {cb}, {...})                                       *micro-async.run*
-    Run a function asynchronously and call the callback with the result.
-
+M.run({...})                                                   *micro-async.run*
 
     Parameters: ~
-        {fn}   (fun(args:...):...)
-        {cb}   (fun(args:...))
         {...}  (any)
 
 
-M.wrap({fn}, {argc})                                          *micro-async.wrap*
-    Wrap a callback-style function to be async.
-
+M.wrap({argc})                                                *micro-async.wrap*
 
     Parameters: ~
-        {fn}    (fun(args:...):...any)
-        {argc}  (integer)
-
-    Returns: ~
-        (fun(args:...):...)
+        {argc}  (integer)  @return fun(...): ...
 
 
 M.schedule()                                              *micro-async.schedule*
@@ -137,13 +119,9 @@ M.defer({timeout})                                           *micro-async.defer*
         {timeout}  (integer)
 
 
-M.work({fn}, {...})                                           *micro-async.work*
-    Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
-
-    @async
+M.work({...})                                                 *micro-async.work*
 
     Parameters: ~
-        {fn}   (fun(args:...):...)
         {...}  (...uv.aliases.threadargs)
 
     Returns: ~
