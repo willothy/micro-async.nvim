@@ -3,38 +3,33 @@
 local yield = coroutine.yield
 local resume = coroutine.resume
 local running = coroutine.running
-local create = coroutine.create
 
 ---@type table<thread, micro-async.Task>
 local handles = setmetatable({}, {
 	__mode = "k",
 })
 
----@class micro-async.Task
----@field thread thread
----@field cancelled boolean
-local Task = {}
-Task.__index = Task
-
 ---@param fn fun(...): ...
-function Task.new(fn)
-	local thread = create(fn)
-	local o = setmetatable({
-		thread = thread,
-		cancelled = false,
-	}, Task)
-	handles[thread] = o
-	return o
-end
+---@return micro-async.Task
+local function new_task(fn)
+	local thread = coroutine.create(fn)
+	local cancelled = false
 
-function Task:cancel()
-	self.cancelled = true
-end
+	local task = {}
 
-function Task:resume(...)
-	if not self.cancelled then
-		resume(self.thread, ...)
+	function task:cancel()
+		cancelled = true
 	end
+
+	function task:resume(...)
+		if not cancelled then
+			resume(thread, ...)
+		end
+	end
+
+	handles[thread] = task
+
+	return task
 end
 
 local M = {}
@@ -56,7 +51,7 @@ end
 ---@param fn fun(...)
 ---@return fun(...): micro-async.Task
 function M.void(fn)
-	local task = Task.new(fn)
+	local task = new_task(fn)
 	return function(...)
 		task:resume(...)
 		return task
@@ -70,7 +65,7 @@ end
 ---@param ... any
 ---@return micro-async.Task
 function M.run(fn, cb, ...)
-	local task = Task.new(function(...)
+	local task = new_task(function(...)
 		cb(fn(...))
 	end)
 	task:resume(...)
@@ -132,9 +127,6 @@ M.lsp = nil
 M.uv = nil
 
 M.ui = {}
-
----@alias micro-async.SelectOpts { prompt: string?, format_item: nil|fun(item: any): string, kind: string? }
----@alias micro-async.InputOpts { prompt: string?, default: string?, completion: string?, highlight: fun(text: string) }
 
 ---@async
 ---@param items any[]
