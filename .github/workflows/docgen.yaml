@@ -29,7 +29,7 @@ jobs:
         run: |
           curl -Lq https://github.com/numToStr/lemmy-help/releases/latest/download/lemmy-help-x86_64-unknown-linux-gnu.tar.gz | tar xz
           cat doc/${{ env.PLUGIN_NAME }}.txt | sed '$d' > /tmp/${{ env.PLUGIN_NAME }}.txt && cat /tmp/${{ env.PLUGIN_NAME }}.txt > doc/${{ env.PLUGIN_NAME }}.txt
-          ./lemmy-help -f -t -a -c lua/micro-async/init.lua lua/micro-async/lsp.lua lua/micro-async/uv.lua >> doc/${{ env.PLUGIN_NAME }}.txt
+          ./lemmy-help -f -t -a -c lua/micro-async/types.lua lua/micro-async/init.lua lua/micro-async/lsp.lua lua/micro-async/uv.lua >> doc/${{ env.PLUGIN_NAME }}.txt
 
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
