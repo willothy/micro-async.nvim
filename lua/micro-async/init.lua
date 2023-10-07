@@ -48,8 +48,8 @@ end
 ---Create an async function that can be called from a synchronous context.
 ---Cannot return values as it is non-blocking.
 ---
----@param fn fun(...)
----@return fun(...): micro-async.Task
+---@return fun(args:...): micro-async.Task
+---@param fn fun(args:...):...
 function M.void(fn)
 	local task = new_task(fn)
 	return function(...)
@@ -60,10 +60,10 @@ end
 
 ---Run a function asynchronously and call the callback with the result.
 ---
+---@return micro-async.Task
 ---@param fn fun(...):...
 ---@param cb fun(...)
 ---@param ... any
----@return micro-async.Task
 function M.run(fn, cb, ...)
 	local task = new_task(function(...)
 		cb(fn(...))

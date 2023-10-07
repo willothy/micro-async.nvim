@@ -89,7 +89,7 @@ M.callback({co})                                          *micro-async.callback*
 
 
 M.void()                                                      *micro-async.void*
-    @return fun(...): micro-async.Task
+    @return fun(args: ...): micro-async.Task
 
 
 M.run({...})                                                   *micro-async.run*
@@ -104,7 +104,7 @@ M.run({...})                                                   *micro-async.run*
 M.wrap({argc})                                                *micro-async.wrap*
 
     Parameters: ~
-        {argc}  (integer)  @return fun(...): ...
+        {argc}  (integer)  @return fun(args: ...): ...
 
 
 M.schedule()                                              *micro-async.schedule*
