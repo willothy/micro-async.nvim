@@ -5,6 +5,38 @@ local resume = coroutine.resume
 local running = coroutine.running
 local create = coroutine.create
 
+---@type table<thread, micro-async.Task>
+local handles = setmetatable({}, {
+	__mode = "k",
+})
+
+---@class micro-async.Task
+---@field thread thread
+---@field cancelled boolean
+local Task = {}
+Task.__index = Task
+
+---@param fn fun(...): ...
+function Task.new(fn)
+	local thread = create(fn)
+	local o = setmetatable({
+		thread = thread,
+		cancelled = false,
+	}, Task)
+	handles[thread] = o
+	return o
+end
+
+function Task:cancel()
+	self.cancelled = true
+end
+
+function Task:resume(...)
+	if not self.cancelled then
+		resume(self.thread, ...)
+	end
+end
+
 local M = {}
 
 ---Create a callback function that resumes the current or specified coroutine when called.
@@ -14,7 +46,7 @@ local M = {}
 function M.callback(co)
 	co = co or running()
 	return function(...)
-		resume(co, ...)
+		handles[co]:resume(...)
 	end
 end
 
@@ -22,10 +54,12 @@ end
 ---Cannot return values as it is non-blocking.
 ---
 ---@param fn fun(...)
----@return fun(...)
+---@return fun(...): micro-async.Task
 function M.void(fn)
+	local task = Task.new(fn)
 	return function(...)
-		resume(create(fn), ...)
+		task:resume(...)
+		return task
 	end
 end
 
@@ -34,13 +68,13 @@ end
 ---@param fn fun(...):...
 ---@param cb fun(...)
 ---@param ... any
+---@return micro-async.Task
 function M.run(fn, cb, ...)
-	resume(
-		create(function(...)
-			cb(fn(...))
-		end),
-		...
-	)
+	local task = Task.new(function(...)
+		cb(fn(...))
+	end)
+	task:resume(...)
+	return task
 end
 
 ---Wrap a callback-style function to be async.
