@@ -6,30 +6,45 @@ local running = coroutine.running
 
 ---@type table<thread, micro-async.Task>
 local handles = setmetatable({}, {
-	__mode = "k",
+  __mode = "k",
 })
+
+local function is_async_task(task)
+  return type(task) == "table"
+    and vim.is_callable(task.cancel)
+    and vim.is_callable(task.is_cancelled)
+end
 
 ---@param fn fun(...): ...
 ---@return micro-async.Task
 local function new_task(fn)
-	local thread = coroutine.create(fn)
-	local cancelled = false
+  local thread = coroutine.create(fn)
+  local cancelled = false
 
-	local task = {}
+  local task = {}
+  local current = nil
 
-	function task:cancel()
-		cancelled = true
-	end
+  function task:cancel()
+    if not cancelled then
+      cancelled = true
+      if current and not current:is_cancelled() then
+        current:cancel()
+      end
+    end
+  end
 
-	function task:resume(...)
-		if not cancelled then
-			resume(thread, ...)
-		end
-	end
+  function task:resume(...)
+    if not cancelled then
+      local _ok, rv = resume(thread, ...)
+      if is_async_task(rv) then
+        current = rv
+      end
+    end
+  end
 
-	handles[thread] = task
+  handles[thread] = task
 
-	return task
+  return task
 end
 
 local M = {}
@@ -39,10 +54,10 @@ local M = {}
 ---@param co thread | nil The thread to resume, defaults to the running one.
 ---@return fun(args:...)
 function M.callback(co)
-	co = co or running()
-	return function(...)
-		handles[co]:resume(...)
-	end
+  co = co or running()
+  return function(...)
+    handles[co]:resume(...)
+  end
 end
 
 ---Create an async function that can be called from a synchronous context.
@@ -51,11 +66,11 @@ end
 ---@return fun(...): micro-async.Task
 ---@param fn fun(...):...
 function M.void(fn)
-	local task = new_task(fn)
-	return function(...)
-		task:resume(...)
-		return task
-	end
+  local task = new_task(fn)
+  return function(...)
+    task:resume(...)
+    return task
+  end
 end
 
 ---Run a function asynchronously and call the callback with the result.
@@ -65,11 +80,11 @@ end
 ---@param cb fun(...)
 ---@param ... any
 function M.run(fn, cb, ...)
-	local task = new_task(function(...)
-		cb(fn(...))
-	end)
-	task:resume(...)
-	return task
+  local task = new_task(function(...)
+    cb(fn(...))
+  end)
+  task:resume(...)
+  return task
 end
 
 ---Wrap a callback-style function to be async.
@@ -78,18 +93,18 @@ end
 ---@param argc integer
 ---@return fun(...): ...
 function M.wrap(fn, argc)
-	return function(...)
-		local args = { ... }
-		args[argc] = M.callback()
-		return yield(fn(unpack(args)))
-	end
+  return function(...)
+    local args = { ... }
+    args[argc] = M.callback()
+    return yield(fn(unpack(args)))
+  end
 end
 
 ---Yields to the Neovim scheduler
 ---
 ---@async
 function M.schedule()
-	return yield(vim.schedule(M.callback()))
+  return yield(vim.schedule(M.callback()))
 end
 
 ---Yields the current task, resuming when the specified timeout has elapsed.
@@ -97,7 +112,7 @@ end
 ---@async
 ---@param timeout integer
 function M.defer(timeout)
-	yield(vim.defer_fn(M.callback(), timeout))
+  yield(vim.defer_fn(M.callback(), timeout))
 end
 
 ---Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
@@ -107,8 +122,8 @@ end
 ---@param ... ...uv.aliases.threadargs
 ---@return ...uv.aliases.threadargs
 function M.work(fn, ...)
-	local uv = require("micro-async.uv")
-	return uv.queue_work(uv.new_work(fn), ...)
+  local uv = require("micro-async.uv")
+  return uv.queue_work(uv.new_work(fn), ...)
 end
 
 ---Async vim.system
@@ -117,7 +132,7 @@ end
 ---@param cmd string[] Command to run
 ---@param opts table Options to pass to `vim.system`
 M.system = function(cmd, opts)
-	return yield(vim.system(cmd, opts, M.callback()))
+  return yield(vim.system(cmd, opts, M.callback()))
 end
 
 ---@module "micro-async.lsp"
@@ -133,23 +148,36 @@ M.ui = {}
 ---@param opts micro-async.SelectOpts
 ---@return any?, integer?
 M.ui.select = function(items, opts)
-	return yield(vim.ui.select(items, opts, M.callback()))
+  vim.ui.select(items, opts, M.callback())
+
+  local win = vim.api.nvim_get_current_win()
+
+  local cancelled = false
+  return yield({
+    cancel = function()
+      vim.api.nvim_win_close(win, true)
+      cancelled = true
+    end,
+    is_cancelled = function()
+      return cancelled
+    end,
+  })
 end
 
 ---@async
 ---@param opts micro-async.InputOpts
 ---@return string?
 M.ui.input = function(opts)
-	return yield(vim.ui.input(opts, M.callback()))
+  return yield(vim.ui.input(opts, M.callback()))
 end
 
 setmetatable(M, {
-	__index = function(_, k)
-		local ok, mod = pcall(require, "micro-async." .. k)
-		if ok then
-			return mod
-		end
-	end,
+  __index = function(_, k)
+    local ok, mod = pcall(require, "micro-async." .. k)
+    if ok then
+      return mod
+    end
+  end,
 })
 
 return M
