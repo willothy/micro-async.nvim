@@ -9,8 +9,8 @@ local uv = {}
 
 ---@type async fun(path: string, entries: integer): err: string?, dir: luv_dir_t
 uv.fs_opendir = function(path, entries)
-	---@diagnostic disable-next-line: param-type-mismatch
-	return yield(vim.uv.fs_opendir(path, callback(), entries))
+  ---@diagnostic disable-next-line: param-type-mismatch
+  return yield(vim.uv.fs_opendir(path, callback(), entries))
 end
 
 ---@type async fun(dir: luv_dir_t): err: string?, entries: uv.aliases.fs_readdir_entries[]
@@ -111,12 +111,12 @@ uv.fs_utime = wrap(vim.uv.fs_utime, 4)
 
 ---@type async fun(fn: fun(...:uv.aliases.threadargs):...: uv.aliases.threadargs): luv_work_ctx_t
 uv.new_work = function(fn)
-	return vim.uv.new_work(fn, callback())
+  return vim.uv.new_work(fn, callback())
 end
 
 ---@type async fun(work: luv_work_ctx_t, ...:uv.aliases.threadargs): ...: uv.aliases.threadargs
 uv.queue_work = function(work, ...)
-	return yield(vim.uv.queue_work(work, ...))
+  return yield(vim.uv.queue_work(work, ...))
 end
 
 return uv
