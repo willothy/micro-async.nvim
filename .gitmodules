@@ -1,0 +1,6 @@
+[submodule "build/mini.test"]
+	path = build/mini.test
+	url = https://github.com/echasnovski/mini.test/
+[submodule "build/mini.doc"]
+	path = build/mini.doc
+	url = https://github.com/echasnovski/mini.doc/
