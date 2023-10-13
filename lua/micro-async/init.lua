@@ -4,17 +4,20 @@ local yield = coroutine.yield
 local resume = coroutine.resume
 local running = coroutine.running
 
+---@private
 ---@type table<thread, micro-async.Task>
 local handles = setmetatable({}, {
   __mode = "k",
 })
 
+---@private
 local function is_async_task(task)
   return type(task) == "table"
     and vim.is_callable(task.cancel)
     and vim.is_callable(task.is_cancelled)
 end
 
+---@private
 ---@param fn fun(...): ...
 ---@return micro-async.Task
 local function new_task(fn)
@@ -47,13 +50,13 @@ local function new_task(fn)
   return task
 end
 
-local M = {}
+local Async = {}
 
 ---Create a callback function that resumes the current or specified coroutine when called.
 ---
 ---@param co thread | nil The thread to resume, defaults to the running one.
 ---@return fun(args:...)
-function M.callback(co)
+function Async.callback(co)
   co = co or running()
   return function(...)
     handles[co]:resume(...)
@@ -65,7 +68,7 @@ end
 ---
 ---@return fun(...): micro-async.Task
 ---@param fn fun(...):...
-function M.void(fn)
+function Async.void(fn)
   local task = new_task(fn)
   return function(...)
     task:resume(...)
@@ -79,7 +82,7 @@ end
 ---@param fn fun(...):...
 ---@param cb fun(...)
 ---@param ... any
-function M.run(fn, cb, ...)
+function Async.run(fn, cb, ...)
   local task = new_task(function(...)
     cb(fn(...))
   end)
@@ -92,10 +95,10 @@ end
 ---@param fn fun(...): ...any
 ---@param argc integer
 ---@return fun(...): ...
-function M.wrap(fn, argc)
+function Async.wrap(fn, argc)
   return function(...)
     local args = { ... }
-    args[argc] = M.callback()
+    args[argc] = Async.callback()
     return yield(fn(unpack(args)))
   end
 end
@@ -103,16 +106,30 @@ end
 ---Yields to the Neovim scheduler
 ---
 ---@async
-function M.schedule()
-  return yield(vim.schedule(M.callback()))
+function Async.schedule()
+  return yield(vim.schedule(Async.callback()))
 end
 
 ---Yields the current task, resuming when the specified timeout has elapsed.
 ---
 ---@async
 ---@param timeout integer
-function M.defer(timeout)
-  yield(vim.defer_fn(M.callback(), timeout))
+function Async.defer(timeout)
+  yield({
+    ---@type uv_timer_t
+    timer = vim.defer_fn(Async.callback(), timeout),
+    cancel = function(self)
+      if not self.timer:is_closing() then
+        if self.timer:is_active() then
+          self.timer:stop()
+        end
+        self.timer:close()
+      end
+    end,
+    is_cancelled = function(self)
+      return self.timer:is_closing()
+    end,
+  })
 end
 
 ---Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
@@ -121,7 +138,7 @@ end
 ---@param fn fun(...):...
 ---@param ... ...uv.aliases.threadargs
 ---@return ...uv.aliases.threadargs
-function M.work(fn, ...)
+function Async.work(fn, ...)
   local uv = require("micro-async.uv")
   return uv.queue_work(uv.new_work(fn), ...)
 end
@@ -131,24 +148,24 @@ end
 ---@async
 ---@param cmd string[] Command to run
 ---@param opts table Options to pass to `vim.system`
-M.system = function(cmd, opts)
-  return yield(vim.system(cmd, opts, M.callback()))
+Async.system = function(cmd, opts)
+  return yield(vim.system(cmd, opts, Async.callback()))
 end
 
 ---@module "micro-async.lsp"
-M.lsp = nil
+Async.lsp = nil
 
 ---@module "micro-async.uv"
-M.uv = nil
+Async.uv = nil
 
-M.ui = {}
+Async.ui = {}
 
 ---@async
 ---@param items any[]
 ---@param opts micro-async.SelectOpts
 ---@return any?, integer?
-M.ui.select = function(items, opts)
-  vim.ui.select(items, opts, M.callback())
+Async.ui.select = function(items, opts)
+  vim.ui.select(items, opts, Async.callback())
 
   local win = vim.api.nvim_get_current_win()
 
@@ -167,11 +184,11 @@ end
 ---@async
 ---@param opts micro-async.InputOpts
 ---@return string?
-M.ui.input = function(opts)
-  return yield(vim.ui.input(opts, M.callback()))
+Async.ui.input = function(opts)
+  return yield(vim.ui.input(opts, Async.callback()))
 end
 
-setmetatable(M, {
+setmetatable(Async, {
   __index = function(_, k)
     local ok, mod = pcall(require, "micro-async." .. k)
     if ok then
@@ -180,4 +197,4 @@ setmetatable(M, {
   end,
 })
 
-return M
+return Async
