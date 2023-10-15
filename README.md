@@ -4,6 +4,12 @@
 
 Extremely simple async library for Neovim.
 
+## Features
+
+- One coroutine per task, minimal overhead
+- Supports cancellation, with or without custom handles
+- Simple interface to create custom async functions
+
 ## Installation
 
 ```lua
@@ -70,4 +76,35 @@ a.run(
   end,
   vim.print
 )
+
+-- Cancel a task before it finishes
+local task = a.void(function()
+  a.defer(1000)
+  vim.notify("Did not cancel", vim.log.levels.ERROR)
+end)()
+task:cancel()
+
+-- Create your own cancellable function
+-- Use `custom_defer` just like a normal async function. When
+-- it is running and the top-level task is cancelled, its cancel()
+-- function will be called.
+--
+-- This function should behave identically to `a.defer` in the above example
+local function custom_defer(timeout)
+  local timer = vim.defer_fn(timeout, a.callback())
+
+  local handle = {}
+
+  function handle:is_cancelled()
+    return timer:is_active()
+  end
+
+  function handle:cancel()
+    if not timer:is_closing()
+      timer:close()
+    end
+  end
+
+  return coroutine.yield(handle)
+end
 ```
