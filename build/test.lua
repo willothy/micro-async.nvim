@@ -9,6 +9,7 @@ Test.setup({
   execute = {
     reporter = Test.gen_reporter.stdout({
       group_depth = 99,
+      quit_on_finish = true,
     }),
     stop_on_error = true,
   },
