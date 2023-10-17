@@ -197,7 +197,7 @@ end
 ---@param opts micro-async.InputOpts
 ---@return string?
 Async.ui.input = function(opts)
-  return yield(vim.ui.input(opts, Async.callback()))
+  return yield(vim.ui.input(opts, Async.scheduled_callback()))
 end
 
 setmetatable(Async, {
