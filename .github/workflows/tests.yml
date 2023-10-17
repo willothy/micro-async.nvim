@@ -32,4 +32,7 @@ jobs:
           neovim: true
           version: ${{ matrix.neovim_version }}
       - name: Run tests
-        run: make test
+        run: |
+          rm -rf build/mini.test
+          git clone https://github.com/echasnovski/mini.test build/mini.test
+          make test

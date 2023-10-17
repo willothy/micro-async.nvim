@@ -10,11 +10,15 @@ coroutine.resume(coroutine.create(function()
   then
     print("cloning mini.test")
     local co = coroutine.running()
-    coroutine.yield(uv.spawn("git", {
-      args = { "submodule", "update", "--remote" },
-    }, function(...)
-      coroutine.resume(co, ...)
-    end))
+    coroutine.yield(uv.spawn(
+      "git",
+      {
+        args = { "submodule", "update", "--remote" },
+      },
+      vim.schedule_wrap(function(...)
+        coroutine.resume(co, ...)
+      end)
+    ))
     print("done")
   end
 
@@ -38,3 +42,5 @@ end))
 vim.wait(10000, function()
   return done
 end)
+
+_G.MiniTest = require("mini.test")
