@@ -1,3 +1,4 @@
+local done = false
 coroutine.resume(coroutine.create(function()
   local uv = vim.uv or vim.loop
 
@@ -31,4 +32,9 @@ coroutine.resume(coroutine.create(function()
       stop_on_error = true,
     },
   })
+  done = true
 end))
+
+vim.wait(10000, function()
+  return done
+end)
