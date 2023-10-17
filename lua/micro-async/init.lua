@@ -63,6 +63,18 @@ function Async.callback(co)
   end
 end
 
+---Create a callback function that resumes the current or specified coroutine when called,
+---and is wrapped in `vim.schedule` to ensure the API is safe to call.
+---
+---@param co thread | nil The thread to resume, defaults to the running one.
+---@return fun(args:...)
+function Async.scheduled_callback(co)
+  co = co or running()
+  return vim.schedule_wrap(function(...)
+    handles[co]:resume(...)
+  end)
+end
+
 ---Create an async function that can be called from a synchronous context.
 ---Cannot return values as it is non-blocking.
 ---
