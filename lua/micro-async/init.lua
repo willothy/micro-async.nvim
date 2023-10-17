@@ -115,6 +115,20 @@ function Async.wrap(fn, argc)
   end
 end
 
+---Wrap a callback-style function to be async, with the callback wrapped in `vim.schedule_wrap`
+---to ensure it is safe to call the nvim API.
+---
+---@param fn fun(...): ...any
+---@param argc integer
+---@return fun(...): ...
+function Async.scheduled_wrap(fn, argc)
+  return function(...)
+    local args = { ... }
+    args[argc] = Async.scheduled_callback()
+    return yield(fn(unpack(args)))
+  end
+end
+
 ---Yields to the Neovim scheduler
 ---
 ---@async
