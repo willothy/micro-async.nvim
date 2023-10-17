@@ -43,7 +43,7 @@ Cancellable functions (mainly libuv functions that return `handles`) are impleme
 
 The `Cancellable` interface matches the cancellation API of top-level tasks, which allows top-level tasks to be used in place of `Cancellable` handles within nested tasks.
 
-Creating a cancellable function is as simple as returning (or yielding, in an async context) a `handle` object that implements the `Cancellable` interface (see [examples](###Examples)).
+Creating a cancellable function is as simple as returning (or yielding, in an async context) a `handle` object that implements the `Cancellable` interface (see [examples](#examples)).
 
 Required methods:
 
