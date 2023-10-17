@@ -5,9 +5,8 @@ env:
 
 on:
   push:
-    paths: [ 'lua/**', 'tests/**' ]
   pull_request:
-    paths: [ 'lua/**', 'tests/**' ]
+  workflow_dispatch:
 
 jobs:
   build:
