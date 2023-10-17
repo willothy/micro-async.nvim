@@ -1,0 +1,159 @@
+micro-async
+
+------------------------------------------------------------------------------
+micro-async.Cancellable                                *micro-async.Cancellable*
+Fields~
+{cancel} `(fun(self: micro-async.Cancellable))`
+{is_cancelled} `(fun(self: micro-async.Cancellable): boolean)`
+
+------------------------------------------------------------------------------
+micro-async.Task                                              *micro-async.Task*
+Fields~
+{thread} `(thread)`
+{resume} `(fun(self: micro-async.Task, ...: any):Cancellable?)`
+
+------------------------------------------------------------------------------
+                                                              *Async.callback()*
+                             `Async.callback`({co})
+
+Create a callback function that resumes the current or specified coroutine when called.
+
+Parameters~
+	{co} `(thread)` | nil The thread to resume, defaults to the running one.
+
+Return~
+	`(fun(args:...))`
+
+------------------------------------------------------------------------------
+                                                    *Async.scheduled_callback()*
+                        `Async.scheduled_callback`({co})
+
+Create a callback function that resumes the current or specified coroutine when called,
+is wrapped in `vim.schedule` to ensure the API is safe to call.
+
+Parameters~
+	{co} `(thread)` | nil The thread to resume, defaults to the running one.
+
+Return~
+	`(fun(args:...))`
+
+------------------------------------------------------------------------------
+                                                                  *Async.void()*
+                               `Async.void`({fn})
+
+Create an async function that can be called from a synchronous context.
+return values as it is non-blocking.
+
+Parameters~
+	{fn} `(fun(...):...)`
+
+Return~
+	`(fun(...): micro-async.Task)`
+
+------------------------------------------------------------------------------
+                                                                   *Async.run()*
+                         `Async.run`({fn}, {cb}, {...})
+
+Run a function asynchronously and call the callback with the result.
+
+Parameters~
+	{fn} `(fun(...):...)`
+	{cb} `(fun(...))`
+	{...} `(any)`
+
+Return~
+	micro-async.Task
+
+------------------------------------------------------------------------------
+                                                                  *Async.wrap()*
+                           `Async.wrap`({fn}, {argc})
+
+Wrap a callback-style function to be async.
+
+Parameters~
+	{fn} `(fun(...): ...any)`
+	{argc} `(integer)`
+
+Return~
+	`(fun(...): ...)`
+
+------------------------------------------------------------------------------
+                                                        *Async.scheduled_wrap()*
+                      `Async.scheduled_wrap`({fn}, {argc})
+
+Wrap a callback-style function to be async, with the callback wrapped in `vim.schedule_wrap`
+ensure it is safe to call the nvim API.
+
+Parameters~
+	{fn} `(fun(...): ...any)`
+	{argc} `(integer)`
+
+Return~
+	`(fun(...): ...)`
+
+------------------------------------------------------------------------------
+                                                              *Async.schedule()*
+                               `Async.schedule`()
+
+Yields to the Neovim scheduler
+
+
+
+------------------------------------------------------------------------------
+                                                                 *Async.defer()*
+                            `Async.defer`({timeout})
+
+Yields the current task, resuming when the specified timeout has elapsed.
+
+
+Parameters~
+	{timeout} `(integer)`
+
+------------------------------------------------------------------------------
+                                                                  *Async.work()*
+                           `Async.work`({fn}, {...})
+
+Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
+
+
+Parameters~
+	{fn} `(fun(...):...)`
+	{...} `(...uv.aliases.threadargs)`
+
+Return~
+	`(...uv.aliases.threadargs)`
+
+------------------------------------------------------------------------------
+                                                                *Async.system()*
+                         `Async.system`({cmd}, {opts})
+
+Async vim.system
+
+
+Parameters~
+	{cmd} `(string[])` Command to run
+	{opts} `(table)` Options to pass to `vim.system`
+
+------------------------------------------------------------------------------
+                                                             *Async.ui.select()*
+                       `Async.ui.select`({items}, {opts})
+
+Parameters~
+	{items} `(any[])`
+	{opts} { prompt: `(string?,)` format_item: nil|fun(item: any): string, kind: string? }
+
+Return~
+	`(any|nil,)` integer|nil
+
+------------------------------------------------------------------------------
+                                                              *Async.ui.input()*
+                            `Async.ui.input`({opts})
+
+Parameters~
+	{opts} { prompt: `(string?,)` default: string?, completion: string?, highlight: fun(text: string) }
+
+Return~
+	`(string|nil)`
+
+
+ vim:tw=78:ts=8:noet:ft=help:norl:

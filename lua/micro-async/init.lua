@@ -1,11 +1,23 @@
 ---@mod micro-async
 
+---@alias micro-async.SelectOpts { prompt: string?, format_item: nil|fun(item: any): string, kind: string? }
+
+---@alias micro-async.InputOpts { prompt: string?, default: string?, completion: string?, highlight: fun(text: string) }
+
+---@class micro-async.Cancellable
+---@field cancel fun(self: micro-async.Cancellable)
+---@field is_cancelled fun(self: micro-async.Cancellable): boolean
+
+---@class micro-async.Task: micro-async.Cancellable
+---@field thread thread
+---@field resume fun(self: micro-async.Task, ...: any):Cancellable?
+
 local yield = coroutine.yield
 local resume = coroutine.resume
 local running = coroutine.running
 
----@private
 ---@type table<thread, micro-async.Task>
+---@private
 local handles = setmetatable({}, {
   __mode = "k",
 })
@@ -17,9 +29,9 @@ local function is_async_task(task)
     and vim.is_callable(task.is_cancelled)
 end
 
----@private
 ---@param fn fun(...): ...
 ---@return micro-async.Task
+---@private
 local function new_task(fn)
   local thread = coroutine.create(fn)
   local cancelled = false
@@ -52,7 +64,7 @@ end
 
 local Async = {}
 
----Create a callback function that resumes the current or specified coroutine when called.
+---@text Create a callback function that resumes the current or specified coroutine when called.
 ---
 ---@param co thread | nil The thread to resume, defaults to the running one.
 ---@return fun(args:...)
@@ -63,7 +75,7 @@ function Async.callback(co)
   end
 end
 
----Create a callback function that resumes the current or specified coroutine when called,
+---@text Create a callback function that resumes the current or specified coroutine when called,
 ---and is wrapped in `vim.schedule` to ensure the API is safe to call.
 ---
 ---@param co thread | nil The thread to resume, defaults to the running one.
@@ -75,11 +87,11 @@ function Async.scheduled_callback(co)
   end)
 end
 
----Create an async function that can be called from a synchronous context.
+---@text Create an async function that can be called from a synchronous context.
 ---Cannot return values as it is non-blocking.
 ---
----@return fun(...): micro-async.Task
 ---@param fn fun(...):...
+---@return fun(...): micro-async.Task
 function Async.void(fn)
   local task = new_task(fn)
   return function(...)
@@ -88,12 +100,12 @@ function Async.void(fn)
   end
 end
 
----Run a function asynchronously and call the callback with the result.
+---@text Run a function asynchronously and call the callback with the result.
 ---
----@return micro-async.Task
 ---@param fn fun(...):...
 ---@param cb fun(...)
 ---@param ... any
+---@return micro-async.Task
 function Async.run(fn, cb, ...)
   local task = new_task(function(...)
     cb(fn(...))
@@ -102,7 +114,7 @@ function Async.run(fn, cb, ...)
   return task
 end
 
----Wrap a callback-style function to be async.
+---@text Wrap a callback-style function to be async.
 ---
 ---@param fn fun(...): ...any
 ---@param argc integer
@@ -115,7 +127,7 @@ function Async.wrap(fn, argc)
   end
 end
 
----Wrap a callback-style function to be async, with the callback wrapped in `vim.schedule_wrap`
+---@text Wrap a callback-style function to be async, with the callback wrapped in `vim.schedule_wrap`
 ---to ensure it is safe to call the nvim API.
 ---
 ---@param fn fun(...): ...any
@@ -129,14 +141,14 @@ function Async.scheduled_wrap(fn, argc)
   end
 end
 
----Yields to the Neovim scheduler
+---@text Yields to the Neovim scheduler
 ---
 ---@async
 function Async.schedule()
   return yield(vim.schedule(Async.callback()))
 end
 
----Yields the current task, resuming when the specified timeout has elapsed.
+---@text Yields the current task, resuming when the specified timeout has elapsed.
 ---
 ---@async
 ---@param timeout integer
@@ -158,7 +170,7 @@ function Async.defer(timeout)
   })
 end
 
----Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
+---@text Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
 ---
 ---@async
 ---@param fn fun(...):...
@@ -169,7 +181,7 @@ function Async.work(fn, ...)
   return uv.queue_work(uv.new_work(fn), ...)
 end
 
----Async vim.system
+---@text Async vim.system
 ---
 ---@async
 ---@param cmd string[] Command to run
@@ -179,17 +191,20 @@ Async.system = function(cmd, opts)
 end
 
 ---@module "micro-async.lsp"
+---@private
 Async.lsp = nil
 
 ---@module "micro-async.uv"
+---@private
 Async.uv = nil
 
+---@private
 Async.ui = {}
 
 ---@async
 ---@param items any[]
 ---@param opts micro-async.SelectOpts
----@return any?, integer?
+---@return any|nil, integer|nil
 Async.ui.select = function(items, opts)
   vim.ui.select(items, opts, Async.callback())
 
@@ -209,7 +224,7 @@ end
 
 ---@async
 ---@param opts micro-async.InputOpts
----@return string?
+---@return string|nil
 Async.ui.input = function(opts)
   return yield(vim.ui.input(opts, Async.scheduled_callback()))
 end
