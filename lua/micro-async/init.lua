@@ -10,7 +10,7 @@
 
 ---@class micro-async.Task: micro-async.Cancellable
 ---@field thread thread
----@field resume fun(self: micro-async.Task, ...: any):Cancellable?
+---@field resume fun(self: micro-async.Task, ...: any):micro-async.Cancellable?
 
 local yield = coroutine.yield
 local resume = coroutine.resume
@@ -50,7 +50,11 @@ local function new_task(fn)
 
   function task:resume(...)
     if not cancelled then
-      local _ok, rv = resume(thread, ...)
+      local ok, rv = resume(thread, ...)
+      if not ok then
+        self:cancel()
+        error(rv)
+      end
       if is_async_task(rv) then
         current = rv
       end
