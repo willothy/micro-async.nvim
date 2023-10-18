@@ -23,7 +23,7 @@ local handles = setmetatable({}, {
 })
 
 ---@private
-local function is_async_task(task)
+local function is_cancellable(task)
   return type(task) == "table"
     and vim.is_callable(task.cancel)
     and vim.is_callable(task.is_cancelled)
@@ -55,7 +55,7 @@ local function new_task(fn)
         self:cancel()
         error(rv)
       end
-      if is_async_task(rv) then
+      if is_cancellable(rv) then
         current = rv
       end
     end
