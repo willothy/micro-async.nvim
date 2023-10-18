@@ -1,5 +1,6 @@
 Async.callback()	micro-async.txt	/*Async.callback()*
 Async.defer()	micro-async.txt	/*Async.defer()*
+Async.join()	micro-async.txt	/*Async.join()*
 Async.run()	micro-async.txt	/*Async.run()*
 Async.schedule()	micro-async.txt	/*Async.schedule()*
 Async.scheduled_callback()	micro-async.txt	/*Async.scheduled_callback()*

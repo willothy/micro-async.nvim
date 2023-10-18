@@ -135,6 +135,14 @@ Parameters~
 	{opts} `(table)` Options to pass to `vim.system`
 
 ------------------------------------------------------------------------------
+                                                                  *Async.join()*
+                              `Async.join`({...})
+
+Join multiple async functions and call the callback with the results.
+Parameters~
+	{...} `(fun():...)`
+
+------------------------------------------------------------------------------
                                                              *Async.ui.select()*
                        `Async.ui.select`({items}, {opts})
 
