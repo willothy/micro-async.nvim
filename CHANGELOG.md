@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.2.0](https://github.com/willothy/micro-async.nvim/compare/v0.1.0...v0.2.0) (2023-10-18)
+
+
+### Features
+
+* add `join` to execute multiple tasks concurrently ([208da4b](https://github.com/willothy/micro-async.nvim/commit/208da4bc66fed1481afbe9bb2698dcc2492c9177))
+* compat with versions using `vim.uv` or `vim.loop` ([1ba5748](https://github.com/willothy/micro-async.nvim/commit/1ba57481dbefe9a50ba0a330f412eb52be192064))
+* propagate errors from tasks ([4faecc2](https://github.com/willothy/micro-async.nvim/commit/4faecc21df1881d70d033251dda848504c0b5bb6))
+
+
+### Bug Fixes
+
+* **ci:** wait for test setup to complete ([79c5d1f](https://github.com/willothy/micro-async.nvim/commit/79c5d1fe5e494a7aa9bbc54b0d00e553528a54c8))
+
 ## 0.1.0 (2023-10-17)
 
 
