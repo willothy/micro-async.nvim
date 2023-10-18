@@ -82,9 +82,9 @@ end
 ---@return fun(args:...)
 function Async.scheduled_callback(co)
   co = co or running()
-  return vim.schedule_wrap(function(...)
+  return function(...)
     handles[co]:resume(...)
-  end)
+  end
 end
 
 ---@text Create an async function that can be called from a synchronous context.
@@ -188,6 +188,24 @@ end
 ---@param opts table Options to pass to `vim.system`
 Async.system = function(cmd, opts)
   return yield(vim.system(cmd, opts, Async.callback()))
+end
+
+---@text Join multiple async functions and call the callback with the results.
+---@param ... fun():...
+function Async.join(...)
+  local thunks = { ... }
+  local remaining = #thunks
+  local results = {}
+  local wrapped = function()
+    for i, thunk in ipairs(thunks) do
+      results[i] = { thunk() }
+      remaining = remaining - 1
+      if remaining == 0 then
+        return unpack(results)
+      end
+    end
+  end
+  return wrapped()
 end
 
 ---@module "micro-async.lsp"
