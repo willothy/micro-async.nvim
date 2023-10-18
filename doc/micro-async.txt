@@ -10,7 +10,7 @@ Fields~
 micro-async.Task                                              *micro-async.Task*
 Fields~
 {thread} `(thread)`
-{resume} `(fun(self: micro-async.Task, ...: any):Cancellable?)`
+{resume} `(fun(self: micro-async.Task, ...: any):micro-async.Cancellable?)`
 
 ------------------------------------------------------------------------------
                                                               *Async.callback()*
