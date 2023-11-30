@@ -59,7 +59,7 @@ describe("tasks", function()
     task:cancel()
     vim.wait(300, function()
       return done
-    end)
+    end, 20, false)
     eq(done, false)
   end)
 end)

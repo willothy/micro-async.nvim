@@ -75,7 +75,9 @@ local Async = {}
 function Async.callback(co)
   co = co or running()
   return function(...)
-    handles[co]:resume(...)
+    if co and handles[co] then
+      handles[co]:resume(...)
+    end
   end
 end
 
