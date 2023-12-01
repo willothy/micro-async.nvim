@@ -65,6 +65,25 @@ Return~
 	micro-async.Task
 
 ------------------------------------------------------------------------------
+                                                              *Async.block_on()*
+                  `Async.block_on`({fn}, {timeout_ms}, {...})
+
+Run an async function syncrhonously and return the result.
+
+WARNING: This will completely block Neovim's main thread!
+
+Parameters~
+	{fn} `(fun(...):...)`
+	{timeout_ms} `(integer?)`
+	{...} `(any)`
+
+Return~
+	`(boolean)`
+
+Return~
+	`(any)` ...
+
+------------------------------------------------------------------------------
                                                                   *Async.wrap()*
                            `Async.wrap`({fn}, {argc})
 

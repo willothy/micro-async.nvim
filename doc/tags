@@ -1,3 +1,4 @@
+Async.block_on()	micro-async.txt	/*Async.block_on()*
 Async.callback()	micro-async.txt	/*Async.callback()*
 Async.defer()	micro-async.txt	/*Async.defer()*
 Async.join()	micro-async.txt	/*Async.join()*
