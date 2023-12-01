@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/willothy/micro-async.nvim/compare/v0.2.0...v0.3.0) (2023-12-01)
+
+
+### Features
+
+* add `block_on` function to synchronously wait for a task ([8c96db0](https://github.com/willothy/micro-async.nvim/commit/8c96db0579f889a38784a2ff5d05ac350f12d043))
+
+
+### Bug Fixes
+
+* ensure coroutine exists before resuming ([9b1fd48](https://github.com/willothy/micro-async.nvim/commit/9b1fd483898e46a29f6dc73e1c8952196dbe3e64))
+
 ## [0.2.0](https://github.com/willothy/micro-async.nvim/compare/v0.1.0...v0.2.0) (2023-10-18)
 
 
