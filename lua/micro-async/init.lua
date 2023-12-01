@@ -120,6 +120,25 @@ function Async.run(fn, cb, ...)
   return task
 end
 
+---@text Run an async function syncrhonously and return the result.
+---@text WARNING: This will completely block Neovim's main thread!
+---
+---@param fn fun(...):...
+---@param timeout_ms integer?
+---@param ... any
+---@return boolean
+---@return any ...
+function Async.block_on(fn, timeout_ms, ...)
+  local done, result = false, nil
+  Async.run(fn, function(...)
+    result, done = { ... }, true
+  end, ...)
+  vim.wait(timeout_ms or 1000, function()
+    return done
+  end)
+  return done, result and unpack(result)
+end
+
 ---@text Wrap a callback-style function to be async.
 ---
 ---@param fn fun(...): ...any
