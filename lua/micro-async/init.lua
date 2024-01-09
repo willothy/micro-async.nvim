@@ -140,8 +140,8 @@ function Async.block_on(fn, timeout_ms, ...)
 end
 
 ---@text Wrap a callback-style function to be async. Add an additional `callback` parameter at the
----end of function, to yield value on its callback. And the `argc` parameter (in `warp` function)
----should be parameters count + 1 (with an additional `callback` parameter).
+---end of function, to yield value on its callback. And the `argc` parameter should be parameters
+---count + 1 (with an additional `callback` parameter).
 ---
 ---@param fn fun(...): ...any
 ---@param argc integer
