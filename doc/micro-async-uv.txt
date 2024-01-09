@@ -8,211 +8,211 @@ vim.uv wrapper
 ------------------------------------------------------------------------------
                                                                *uv.fs_opendir()*
                        `uv.fs_opendir`({path}, {entries})
-Type~
+Type ~
 async `(fun(path: string, entries: integer): err:)` string?, dir: luv_dir_t
 
 ------------------------------------------------------------------------------
                                                                  *uv.fs_readdir*
                                 `uv.fs_readdir`
-Type~
+Type ~
 async `(fun(dir: luv_dir_t): err:)` string?, entries: uv.aliases.fs_readdir_entries[]
 
 ------------------------------------------------------------------------------
                                                                 *uv.fs_realpath*
                                 `uv.fs_realpath`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, path: string?
 
 ------------------------------------------------------------------------------
                                                                 *uv.fs_readlink*
                                 `uv.fs_readlink`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, path: string?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_access*
                                  `uv.fs_access`
-Type~
+Type ~
 async `(fun(path: string, mode: integer): err:)` string?, permissions: boolean?
 
 ------------------------------------------------------------------------------
                                                                     *uv.fs_read*
                                   `uv.fs_read`
-Type~
+Type ~
 async `(fun(fd: integer, size: integer, offset: integer?): err:)` string?, data: string?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_rename*
                                  `uv.fs_rename`
-Type~
+Type ~
 async `(fun(path: string, new_path: string): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                     *uv.fs_open*
                                   `uv.fs_open`
-Type~
+Type ~
 async `(fun(path: string, flags: integer | uv.aliases.fs_access_flags, mode: integer): err:)` string?, fs: integer?
 
 ------------------------------------------------------------------------------
                                                                  *uv.fs_mkstemp*
                                 `uv.fs_mkstemp`
-Type~
+Type ~
 async `(fun(template: string): err:)` string?, fd: integer?, path: string?
 
 ------------------------------------------------------------------------------
                                                                  *uv.fs_mkdtemp*
                                 `uv.fs_mkdtemp`
-Type~
+Type ~
 async `(fun(template: string): err:)` string?, path: string?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_rmdir*
                                  `uv.fs_rmdir`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_mkdir*
                                  `uv.fs_mkdir`
-Type~
+Type ~
 async `(fun(path: string, mode: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_chmod*
                                  `uv.fs_chmod`
-Type~
+Type ~
 async `(fun(path: string, mode: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_chown*
                                  `uv.fs_chown`
-Type~
+Type ~
 async `(fun(path: string, uid: integer, gid: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_fchmod*
                                  `uv.fs_fchmod`
-Type~
+Type ~
 async `(fun(fd: integer, mode: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_fchown*
                                  `uv.fs_fchown`
-Type~
+Type ~
 async `(fun(fd: integer, uid: integer, gid: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                 *uv.getnameinfo*
                                 `uv.getnameinfo`
-Type~
+Type ~
 async `(fun(address: uv.aliases.getsockname_rtn))`
 
 ------------------------------------------------------------------------------
                                                                 *uv.fs_copyfile*
                                 `uv.fs_copyfile`
-Type~
+Type ~
 async `(fun(path: string, new_path: string, flags: uv.aliases.fs_copyfile_flags): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_futime*
                                  `uv.fs_futime`
-Type~
+Type ~
 async `(fun(fd: integer, atime: integer, mtime: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                *uv.fs_ftruncate*
                                `uv.fs_ftruncate`
-Type~
+Type ~
 async `(fun(fd: integer, offset: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                     *uv.fs_link*
                                   `uv.fs_link`
-Type~
+Type ~
 async `(fun(path: string, new_path: string): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_unlink*
                                  `uv.fs_unlink`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_write*
                                  `uv.fs_write`
-Type~
+Type ~
 async `(fun(fd: integer, data: string | string[], offset: integer?): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                  *uv.fs_symlink*
                                 `uv.fs_symlink`
-Type~
+Type ~
 async `(fun(path: string, newpath: string, flags: integer | uv.aliases.fs_symlink_flags): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_lutime*
                                  `uv.fs_lutime`
-Type~
+Type ~
 async `(fun(path: string, atime: integer, mtime: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                     *uv.fs_stat*
                                   `uv.fs_stat`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, stat: uv.aliases.fs_stat_table
 
 ------------------------------------------------------------------------------
                                                                  *uv.fs_scandir*
                                 `uv.fs_scandir`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, stat: uv_fs_t?
 
 ------------------------------------------------------------------------------
                                                                   *uv.fs_statfs*
                                  `uv.fs_statfs`
-Type~
+Type ~
 async `(fun(path: string): err:)` string?, stat: uv.aliases.fs_statfs_stats
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_fsync*
                                  `uv.fs_fsync`
-Type~
+Type ~
 async `(fun(fd: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                 *uv.fs_sendfile*
                                 `uv.fs_sendfile`
-Type~
+Type ~
 async `(fun(out_fd: integer, in_fd: integer, in_offset: integer, size: integer): err:)` string?, bytes: integer?
 
 ------------------------------------------------------------------------------
                                                                *uv.fs_fdatasync*
                                `uv.fs_fdatasync`
-Type~
+Type ~
 async `(fun(fd: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_close*
                                  `uv.fs_close`
-Type~
+Type ~
 async `(fun(fd: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                    *uv.fs_utime*
                                  `uv.fs_utime`
-Type~
+Type ~
 async `(fun(path: string, atime: integer, mtime: integer): err:)` string?, success: boolean?
 
 ------------------------------------------------------------------------------
                                                                  *uv.new_work()*
                               `uv.new_work`({fn})
-Type~
+Type ~
 async `(fun(fn: fun(...:uv.aliases.threadargs):...: uv.aliases.threadargs): luv_work_ctx_t)`
 
 ------------------------------------------------------------------------------
                                                                *uv.queue_work()*
                          `uv.queue_work`({work}, {...})
-Type~
+Type ~
 async `(fun(work: luv_work_ctx_t, ...:uv.aliases.threadargs): ...:)` uv.aliases.threadargs
 
 

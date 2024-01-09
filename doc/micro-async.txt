@@ -2,13 +2,13 @@ micro-async
 
 ------------------------------------------------------------------------------
 micro-async.Cancellable                                *micro-async.Cancellable*
-Fields~
+Fields ~
 {cancel} `(fun(self: micro-async.Cancellable))`
 {is_cancelled} `(fun(self: micro-async.Cancellable): boolean)`
 
 ------------------------------------------------------------------------------
 micro-async.Task                                              *micro-async.Task*
-Fields~
+Fields ~
 {thread} `(thread)`
 {resume} `(fun(self: micro-async.Task, ...: any):micro-async.Cancellable?)`
 
@@ -18,10 +18,10 @@ Fields~
 
 Create a callback function that resumes the current or specified coroutine when called.
 
-Parameters~
+Parameters ~
 	{co} `(thread)` | nil The thread to resume, defaults to the running one.
 
-Return~
+Return ~
 	`(fun(args:...))`
 
 ------------------------------------------------------------------------------
@@ -31,10 +31,10 @@ Return~
 Create a callback function that resumes the current or specified coroutine when called,
 is wrapped in `vim.schedule` to ensure the API is safe to call.
 
-Parameters~
+Parameters ~
 	{co} `(thread)` | nil The thread to resume, defaults to the running one.
 
-Return~
+Return ~
 	`(fun(args:...))`
 
 ------------------------------------------------------------------------------
@@ -44,10 +44,10 @@ Return~
 Create an async function that can be called from a synchronous context.
 return values as it is non-blocking.
 
-Parameters~
+Parameters ~
 	{fn} `(fun(...):...)`
 
-Return~
+Return ~
 	`(fun(...): micro-async.Task)`
 
 ------------------------------------------------------------------------------
@@ -56,12 +56,12 @@ Return~
 
 Run a function asynchronously and call the callback with the result.
 
-Parameters~
+Parameters ~
 	{fn} `(fun(...):...)`
 	{cb} `(fun(...))`
 	{...} `(any)`
 
-Return~
+Return ~
 	micro-async.Task
 
 ------------------------------------------------------------------------------
@@ -72,28 +72,30 @@ Run an async function syncrhonously and return the result.
 
 WARNING: This will completely block Neovim's main thread!
 
-Parameters~
+Parameters ~
 	{fn} `(fun(...):...)`
 	{timeout_ms} `(integer?)`
 	{...} `(any)`
 
-Return~
+Return ~
 	`(boolean)`
 
-Return~
+Return ~
 	`(any)` ...
 
 ------------------------------------------------------------------------------
                                                                   *Async.wrap()*
                            `Async.wrap`({fn}, {argc})
 
-Wrap a callback-style function to be async.
+Wrap a callback-style function to be async. Add an additional `callback` parameter at the
+of function, to yield value on its callback. And the `argc` parameter should be parameters
++ 1 (with an additional `callback` parameter).
 
-Parameters~
+Parameters ~
 	{fn} `(fun(...): ...any)`
 	{argc} `(integer)`
 
-Return~
+Return ~
 	`(fun(...): ...)`
 
 ------------------------------------------------------------------------------
@@ -103,11 +105,11 @@ Return~
 Wrap a callback-style function to be async, with the callback wrapped in `vim.schedule_wrap`
 ensure it is safe to call the nvim API.
 
-Parameters~
+Parameters ~
 	{fn} `(fun(...): ...any)`
 	{argc} `(integer)`
 
-Return~
+Return ~
 	`(fun(...): ...)`
 
 ------------------------------------------------------------------------------
@@ -125,7 +127,7 @@ Yields to the Neovim scheduler
 Yields the current task, resuming when the specified timeout has elapsed.
 
 
-Parameters~
+Parameters ~
 	{timeout} `(integer)`
 
 ------------------------------------------------------------------------------
@@ -135,11 +137,11 @@ Parameters~
 Wrapper that creates and queues a work request, yields, and resumes the current task with the results.
 
 
-Parameters~
+Parameters ~
 	{fn} `(fun(...):...)`
 	{...} `(...uv.aliases.threadargs)`
 
-Return~
+Return ~
 	`(...uv.aliases.threadargs)`
 
 ------------------------------------------------------------------------------
@@ -149,7 +151,7 @@ Return~
 Async vim.system
 
 
-Parameters~
+Parameters ~
 	{cmd} `(string[])` Command to run
 	{opts} `(table)` Options to pass to `vim.system`
 
@@ -158,28 +160,28 @@ Parameters~
                               `Async.join`({...})
 
 Join multiple async functions and call the callback with the results.
-Parameters~
+Parameters ~
 	{...} `(fun():...)`
 
 ------------------------------------------------------------------------------
                                                              *Async.ui.select()*
                        `Async.ui.select`({items}, {opts})
 
-Parameters~
+Parameters ~
 	{items} `(any[])`
 	{opts} { prompt: `(string?,)` format_item: nil|fun(item: any): string, kind: string? }
 
-Return~
+Return ~
 	`(any|nil,)` integer|nil
 
 ------------------------------------------------------------------------------
                                                               *Async.ui.input()*
                             `Async.ui.input`({opts})
 
-Parameters~
+Parameters ~
 	{opts} { prompt: `(string?,)` default: string?, completion: string?, highlight: fun(text: string) }
 
-Return~
+Return ~
 	`(string|nil)`
 
 
