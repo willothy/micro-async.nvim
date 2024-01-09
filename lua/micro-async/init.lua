@@ -114,7 +114,10 @@ end
 ---@return micro-async.Task
 function Async.run(fn, cb, ...)
   local task = new_task(function(...)
-    cb(fn(...))
+    local ok, err = pcall(cb, fn, ...)
+    if not ok then
+      error(err)
+    end
   end)
   task:resume(...)
   return task
