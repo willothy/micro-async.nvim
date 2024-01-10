@@ -47,6 +47,7 @@ describe("run", function()
         done = true
         return done
       end, function(returned_done)
+        -- here throw assertion exception
         assert(not returned_done, "returned done must be false")
       end)
       vim.wait(200, function()
