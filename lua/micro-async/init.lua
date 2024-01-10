@@ -114,7 +114,9 @@ end
 ---@return micro-async.Task
 function Async.run(fn, cb, ...)
   local task = new_task(function(...)
-    local ok, err = pcall(cb, fn, ...)
+    -- invoke user provided `cb` with pcall to run in safe mode
+    local ok, err = pcall(cb, fn(...))
+    -- if there's any exception, throw error message to user
     if not ok then
       error(err)
     end

@@ -38,6 +38,25 @@ local function describe(set_name, set_fn, parent)
   return set
 end
 
+describe("run", function()
+  it("throw exception in cb", function()
+    -- expect assertion error thrown from `cb`
+    expect.error(function()
+      local done = false
+      a.run(function()
+        done = true
+        return done
+      end, function(returned_done)
+        assert(not returned_done, "returned done must be false")
+      end)
+      vim.wait(200, function()
+        return done
+      end)
+      eq(done, true)
+    end)
+  end)
+end)
+
 describe("tasks", function()
   it("works", function()
     local done = false
