@@ -115,6 +115,25 @@ local task = a.void(function()
 end)()
 task:cancel()
 
+-- Create wrap function on `vim.system` and yield value on exit.
+-- The `callback` parameter is an additional parameter added to the end of wrapped function,
+-- to yield value on `vim.system` exit.
+local system_wrap = a.wrap(function(cmd, opts, callback)
+  vim.system(cmd, opts, function(system_completed)
+    callback(system_completed)
+  end)
+end, 3)
+a.run(
+  function()
+    -- returns the yield value just like sync function.
+    local system_completed = system_wrap({ "tokei", "--output", "json" }, { text = true })
+    return system_completed
+  end,
+  function(system_completed)
+    vim.print(vim.inspect(system_completed))
+  end
+)
+
 -- Create your own cancellable function
 -- Use `custom_defer` just like a normal async function. When
 -- it is running and the top-level task is cancelled, its cancel()

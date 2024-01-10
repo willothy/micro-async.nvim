@@ -9,14 +9,14 @@ wrapper for LSP requests
                                                                *lsp.buf_request*
                                `lsp.buf_request`
 wrapper around `vim.lsp.buf_request`.
-Type~
+Type ~
 async `(fun(bufnr: integer, method: string, params: table?): error:)` lsp.ResponseError?, result: table, context: lsp.HandlerContext, config: table?
 
 ------------------------------------------------------------------------------
                                                            *lsp.buf_request_all*
                              `lsp.buf_request_all`
 wrapper around `vim.lsp.buf_request_all`.
-Type~
+Type ~
 async `(fun(bufnr: integer, method: string, params: table?): table<integer,)` { error: lsp.ResponseError, result: table }>
 
 
